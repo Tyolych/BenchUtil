@@ -1,23 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-
-void	initIOPS32 (const int POOL);
-void	*calculateIOPS32 (void *arg);
-
-int main (int argc, char** argv) {
-    int n;
-    if (argc == 1) {
-        printf("Number of CPU cores to run Benchmark: ");
-        scanf("%d", &n);
-    } else {
-        n = atoi(argv[1]);
-    }
-    printf("Benchmarking for 32 Bit Integer operations per second\n");
-    initIOPS32(n);
-    return 0;
-}
+#include "BenchUtil.h"
 
 void *calculateIOPS32 (void *arg) {
     unsigned long long noOfOperations = 0, loopOperations = 30;
@@ -44,7 +25,8 @@ void initIOPS32 (const int POOL) {
                 iopsLog[r][i] = 0;
                 pthread_create(&memThreads[r], NULL, calculateIOPS32, &tFlops[r]);
             }
-        sleep(60);
+        printf("please wait: it takes %d seconds\n",SECONDS); fflush(stdout);            
+        sleep(SECONDS);
         for (int r = 0; r < POOL; r++)
             iopsLog[r][i] = tFlops[r];
     }
@@ -62,7 +44,7 @@ void initIOPS32 (const int POOL) {
         printf("%d| ", i + 1);
         fprintf(fptr, "%d| ", i + 1);
         for (int r = 0; r < POOL; r++) {
-            temp = (i == 0) ? (iopsLog[r][i] / 60) : (iopsLog[r][i] - iopsLog[r][i - 1]) / 60;
+            temp = (i == 0) ? (iopsLog[r][i] / SECONDS) : (iopsLog[r][i] - iopsLog[r][i - 1]) / SECONDS;
             iops[i] += temp;
             singleCoreMax = (temp > singleCoreMax) ? temp : singleCoreMax;
             printf("Tr %d: %llu ", r + 1, temp);
@@ -77,4 +59,12 @@ void initIOPS32 (const int POOL) {
     fprintf(fptr, "Maximum CPU Throughput: %lf Gigaiops.\n", maxiops / 1000000000.0f);
     fprintf(fptr, "Maximum Single Core Throughput: %lf Gigaiops.\n", singleCoreMax / 1000000000.0f);
     fclose(fptr);
+}
+
+int main (int argc, char** argv) {
+    int n = get_number_of_threads(argc, argv);
+    printf("Benchmarking for 32 Bit Integer operations per second\n");
+    printf("using %d threads\n",n);
+    initIOPS32(n);
+    return 0;
 }

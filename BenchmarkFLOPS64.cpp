@@ -1,23 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
+#include "BenchUtil.h"
 
-void	initFLOPS64 (const int POOL);
-void	*calculateFLOPS64 (void *arg);
-
-int main (int argc, char** argv) {
-	int n;
-	if (argc == 1) {
-		printf("Number of CPU cores to run Benchmark: ");
-		scanf("%d", &n);
-	} else {
-		n = atoi(argv[1]);
-	}
-    printf("Benchmarking for 64 Bit Floating point operations per second\n");
-	initFLOPS64(n);
-	return 0;
-}
 
 void *calculateFLOPS64 (void *arg) {
 	unsigned long long noOfOperations = 0, loopOperations = 30;
@@ -44,7 +26,8 @@ void initFLOPS64 (const int POOL) {
 				flopsLog[r][i] = 0;
 				pthread_create(&memThreads[r], NULL, calculateFLOPS64, &tFlops[r]);
 			}
-		sleep(60);
+        printf("please wait: it takes %d seconds\n",SECONDS); fflush(stdout);        
+		sleep(SECONDS);
 		for (int r = 0; r < POOL; r++)
 			flopsLog[r][i] = tFlops[r];
 	}
@@ -62,7 +45,7 @@ void initFLOPS64 (const int POOL) {
 		printf("%d| ", i + 1);
 		fprintf(fptr, "%d| ", i + 1);
 		for (int r = 0; r < POOL; r++) {
-			temp = (i == 0) ? (flopsLog[r][i] / 60) : (flopsLog[r][i] - flopsLog[r][i - 1]) / 60;
+			temp = (i == 0) ? (flopsLog[r][i] / SECONDS) : (flopsLog[r][i] - flopsLog[r][i - 1]) / SECONDS;
 			flops[i] += temp;
 			singleCoreMax = (temp > singleCoreMax) ? temp : singleCoreMax;
 			printf("Tr %d: %llu ", r + 1, temp);
@@ -77,4 +60,12 @@ void initFLOPS64 (const int POOL) {
 	fprintf(fptr, "Maximum CPU Throughput: %lf Gigaflops.\n", maxflops / 1000000000.0f);
 	fprintf(fptr, "Maximum Single Core Throughput: %lf Gigaflops.\n", singleCoreMax / 1000000000.0f);
 	fclose(fptr);
+}
+
+int main (int argc, char** argv) {
+	int n = get_number_of_threads(argc, argv);
+    printf("Benchmarking for 64 Bit Floating point operations per second\n");
+    printf("using %d threads\n",n);
+	initFLOPS64(n);
+	return 0;
 }

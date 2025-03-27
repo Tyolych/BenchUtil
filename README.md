@@ -1,3 +1,5 @@
+# Если собрать с -O2 то не работает 
+
 # BenchUtil
 CPU Benchmarking Tool by calculating IOPS and FLOPS.
 

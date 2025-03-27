@@ -2,13 +2,13 @@ CC = gcc
 CFLAGS = -lpthread -Wno-overflow -pthread
 
 TARGET1 = flops32
-FILE1	= BenchmarkFLOPS32.c
+FILE1	= BenchmarkFLOPS32.cpp
 TARGET2 = flops64
-FILE2	= BenchmarkFLOPS64.c
+FILE2	= BenchmarkFLOPS64.cpp
 TARGET3 = iops32
-FILE3	= BenchmarkIOPS32.c
+FILE3	= BenchmarkIOPS32.cpp
 TARGET4 = iops64
-FILE4 	= BenchmarkIOPS64.c
+FILE4 	= BenchmarkIOPS64.cpp
 
 all:	$(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4)
 

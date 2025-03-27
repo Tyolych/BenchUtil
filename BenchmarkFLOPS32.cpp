@@ -1,23 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-
-void	initFLOPS32 (const int POOL);
-void	*calculateFLOPS32 (void *arg);
-
-int main (int argc, char** argv) {
-    int n;
-    if (argc == 1) {
-        printf("Number of CPU cores to run Benchmark: ");
-        scanf("%d", &n);
-    } else {
-        n = atoi(argv[1]);
-    }
-    printf("Benchmarking for 32 Bit Floating point operations per second\n");
-    initFLOPS32(n);
-    return 0;
-}
+#include "BenchUtil.h"
 
 void *calculateFLOPS32 (void *arg) {
     unsigned long long noOfOperations = 0, loopOperations = 30;
@@ -44,7 +25,8 @@ void initFLOPS32 (const int POOL) {
                 flopsLog[r][i] = 0;
                 pthread_create(&memThreads[r], NULL, calculateFLOPS32, &tFlops[r]);
             }
-        sleep(60);
+        printf("please wait: it takes %d seconds", SECONDS); fflush(stdout);
+        sleep(SECONDS);
         for (int r = 0; r < POOL; r++)
             flopsLog[r][i] = tFlops[r];
     }
@@ -77,4 +59,15 @@ void initFLOPS32 (const int POOL) {
     fprintf(fptr, "Maximum CPU Throughput: %lf Gigaflops.\n", maxflops / 1000000000.0f);
     fprintf(fptr, "Maximum Single Core Throughput: %lf Gigaflops.\n", singleCoreMax / 1000000000.0f);
     fclose(fptr);
+}
+
+int main (int argc, char** argv) {
+    
+    int n = get_number_of_threads(argc,argv);
+    
+    printf("Benchmarking for 32 Bit Floating point operations per second\n");
+    printf("using %d threads\n",n);
+    
+    initFLOPS32(n);
+    return 0;
 }
